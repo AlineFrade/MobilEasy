@@ -24,7 +24,8 @@ class _MaterialYouState extends State<MaterialYou> {
   List<Widget> pages = const [
     Profile(),
     Configurations(),
-    Text('MAP', style: _textStyle),
+    NavigationPage(),
+    //Text('MAP', style: _textStyle),
     CreateProfile(),
     LoginPage(),
   ];
