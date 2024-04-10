@@ -86,7 +86,7 @@ class _MaterialYouState extends State<MaterialYou> {
                 NavigationDestination(
                   icon: Icon(Icons.change_circle_outlined,
                       color: Color.fromARGB(255, 0, 0, 0)),
-                  selectedIcon: Icon(Icons.camera_alt_outlined,
+                  selectedIcon: Icon(Icons.change_circle_outlined,
                       color: Color.fromARGB(255, 185, 213, 131)),
                   label: 'Change profile',
                 ),
@@ -100,14 +100,14 @@ class _MaterialYouState extends State<MaterialYou> {
                 NavigationDestination(
                   icon: Icon(Icons.person_add_alt_1_outlined,
                       color: Color.fromARGB(255, 0, 0, 0)),
-                  selectedIcon: Icon(Icons.graphic_eq_outlined,
+                  selectedIcon: Icon(Icons.person_add_alt_1_outlined,
                       color: Color.fromARGB(255, 104, 60, 10)),
                   label: 'Create  Account',
                 ),
                 NavigationDestination(
                   icon: Icon(Icons.lock_outline,
                       color: Color.fromARGB(255, 0, 0, 0)),
-                  selectedIcon: Icon(Icons.egg_alt_outlined,
+                  selectedIcon: Icon(Icons.lock_outline,
                       color: Color.fromARGB(255, 104, 60, 10)),
                   label: 'Login',
                 ),
