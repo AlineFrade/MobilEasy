@@ -9,6 +9,7 @@ class NavigationPage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Color.fromARGB(255, 0, 100, 0),
         title: Text('Navegação'),
+        //automaticallyImplyLeading: false,
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -46,9 +47,6 @@ class NavigationPage extends StatelessWidget {
             width: 200, // Para ocupar toda a largura disponível
             child: Column(
               children: <Widget>[
-                Expanded(
-                  child: Image.network('https://i.ibb.co/42ZqFYD/praia.jpg')
-                ),
                 SizedBox(
                   height: 20,
                 ),

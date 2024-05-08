@@ -1,5 +1,5 @@
 import 'package:MobilEasy/createAccount.dart';
-import 'package:MobilEasy/inicialPage.dart';
+import 'package:MobilEasy/loginPage.dart';
 import 'package:MobilEasy/profile.dart';
 import 'package:flutter/material.dart';
 import 'package:MobilEasy/configurations.dart';
