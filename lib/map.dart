@@ -44,13 +44,27 @@ class NavigationPage extends StatelessWidget {
           Container(
             height: 300, // Defina a altura desejada para a imagem
             width: 200, // Para ocupar toda a largura disponível
-            child: Image.asset(
-              'lib/_images/map.jpg', // Caminho da imagem
-              fit: BoxFit.cover, // Para cobrir o espaço definido pelo container
-            ),
+            child: Column(
+              children: <Widget>[
+                Expanded(
+                  child: Image.network('https://i.ibb.co/42ZqFYD/praia.jpg')
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                Expanded(child: Image.network('https://i.ibb.co/42ZqFYD/praia.jpg', semanticLabel: 'Foto de praia'),
+              ),
+            ],)
           ),
         ],
       ),
+
+      floatingActionButton: FloatingActionButton(
+        onPressed: (){},
+        tooltip: "Acessibilidade",
+        child: Icon(Icons.accessibility),
+      ),
+
     );
   }
 }
