@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:MobilEasy/map.dart';
-import 'package:MobilEasy/createAccount.dart';
+import 'package:MobilEasy/pages/map.dart';
+import 'package:MobilEasy/pages/createAccount.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -56,7 +56,7 @@ class LoginPage extends StatelessWidget {
                   label: 'Botão para fazer login',
                   child: ElevatedButton(
                       onPressed: () {
-                      Navigator.pushNamed(context, 'navigationPage');
+                      Navigator.pushNamed(context, 'userListPage');
                   },
                   child: Text('Login'),
                   ),

@@ -1,9 +1,9 @@
-import 'package:MobilEasy/createAccount.dart';
-import 'package:MobilEasy/loginPage.dart';
-import 'package:MobilEasy/profile.dart';
+import 'package:MobilEasy/pages/createAccount.dart';
+import 'package:MobilEasy/pages/loginPage.dart';
+import 'package:MobilEasy/pages/profile.dart';
 import 'package:flutter/material.dart';
-import 'package:MobilEasy/configurations.dart';
-import 'package:MobilEasy/map.dart';
+import 'package:MobilEasy/pages/configurations.dart';
+import 'package:MobilEasy/pages/map.dart';
 
 const TextStyle _textStyle = TextStyle(
   fontSize: 40,
@@ -26,7 +26,7 @@ class _MaterialYouState extends State<MaterialYou> {
     Configurations(),
     NavigationPage(),
     //Text('MAP', style: _textStyle),
-    CreateProfile(),
+    //CreateProfile(),
     LoginPage(),
   ];
   @override

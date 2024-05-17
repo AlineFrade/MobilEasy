@@ -1,8 +1,9 @@
-import 'package:MobilEasy/configurations.dart';
-import 'package:MobilEasy/createAccount.dart';
-import 'package:MobilEasy/map.dart';
-import 'package:MobilEasy/menu.dart';
-import 'package:MobilEasy/profile.dart';
+import 'package:MobilEasy/pages/configurations.dart';
+import 'package:MobilEasy/pages/createAccount.dart';
+import 'package:MobilEasy/pages/loginPage.dart';
+import 'package:MobilEasy/pages/map.dart';
+import 'package:MobilEasy/pages/menu.dart';
+import 'package:MobilEasy/pages/profile.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -16,8 +17,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Onboarding Screen',
-      home: MaterialYou(),
-      // home: LoginPage();
+      //home: MaterialYou(),
+      home: LoginPage(),
       debugShowCheckedModeBanner: false,
 
       routes: {
@@ -25,6 +26,7 @@ class MyApp extends StatelessWidget {
         'createAccount': (context) => CreateProfile(),
         'configurateProfile': (context) => Configurations(),
         'profilePage': (context) => Profile(),
+        'loginPage': (context) => LoginPage(),
       },
     );
   }
