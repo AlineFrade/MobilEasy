@@ -17,9 +17,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Onboarding Screen',
-      //home: MaterialYou(),
-      home: LoginPage(),
       debugShowCheckedModeBanner: false,
+      theme: ThemeData(primaryColor: Colors.white),
+      //home: MaterialYou(),
+      home: NavigationPage(),
 
       routes: {
         'navigationPage': (context) => NavigationPage(),
