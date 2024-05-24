@@ -1,3 +1,5 @@
+import 'package:MobilEasy/pages/directions_model.dart';
+import 'package:MobilEasy/pages/directions_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
@@ -15,6 +17,7 @@ class _NavigationPageState extends State<NavigationPage> {
   late GoogleMapController _googleMapController;
   Marker? _origin;
   Marker? _destination;
+  Directions? _info;
 
   @override
   void dispose() {
@@ -70,28 +73,63 @@ class _NavigationPageState extends State<NavigationPage> {
           ),
         ],
       ),
-      body: GoogleMap(
-        myLocationButtonEnabled: false,
-        initialCameraPosition: _initialCameraPosition,
-        onMapCreated: (controller) => _googleMapController = controller,
-        markers: {
-          if (_origin != null) _origin!,
-          if (_destination != null) _destination!,
-        },
-        onLongPress: _addMarker,
+      body: Stack(
+        alignment: Alignment.center,
+        children: [
+          GoogleMap(
+            myLocationButtonEnabled: false,
+            initialCameraPosition: _initialCameraPosition,
+            onMapCreated: (controller) => _googleMapController = controller,
+            markers: {
+              if (_origin != null) _origin!,
+              if (_destination != null) _destination!,
+            },
+            onLongPress: _addMarker,
+          ),
+          if (_info != null)
+          Positioned(
+            top: 20.0,
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                vertical: 6.0,
+                horizontal: 12.0,
+              ),
+              decoration: BoxDecoration(
+                color: Colors.yellowAccent,
+                borderRadius: BorderRadius.circular(20.0),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Colors.black26,
+                    offset: Offset(0, 2),
+                    blurRadius: 6.0,
+                  )
+                ],
+              ),
+              child: Text(
+                '${_info!.totalDistance}, ${_info!.totalDuration}',
+                style: const TextStyle(
+                  fontSize: 18.8,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Theme.of(context).primaryColor,
         foregroundColor: Colors.green,
         onPressed: () => _googleMapController.animateCamera(
-          CameraUpdate.newCameraPosition(_initialCameraPosition),
+          _info != null
+              ? CameraUpdate.newLatLngBounds(_info!.bounds, 100.0)
+              : CameraUpdate.newCameraPosition(_initialCameraPosition),
         ),
         child: const Icon(Icons.center_focus_strong),
       ),
     );
   }
 
-  void _addMarker(LatLng pos) {
+  void _addMarker(LatLng pos) async {
     if (_origin == null || (_origin != null && _destination != null)) {
       setState(() {
         _origin = Marker(
@@ -101,6 +139,7 @@ class _NavigationPageState extends State<NavigationPage> {
           position: pos,
         );
         _destination = null;
+        _info = null;
       });
     } else {
       setState(() {
@@ -111,6 +150,10 @@ class _NavigationPageState extends State<NavigationPage> {
           position: pos,
         );
       });
+
+      final directions = await DirectionsRepository()
+          .getDirections(origin: _origin!.position, destination: pos);
+      setState(() => _info = directions);
     }
   }
 }
