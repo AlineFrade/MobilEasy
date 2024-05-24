@@ -13,7 +13,6 @@ class NavigationPage extends StatefulWidget {
 }
 
 class _NavigationPageState extends State<NavigationPage> {
-
   late GoogleMapController _googleMapController;
   Marker? _origin;
   Marker? _destination;
@@ -84,36 +83,47 @@ class _NavigationPageState extends State<NavigationPage> {
               if (_origin != null) _origin!,
               if (_destination != null) _destination!,
             },
+            polylines: {
+              if (_info != null)
+                Polyline(
+                  polylineId: const PolylineId('overview_polyline'),
+                  color: Colors.red,
+                  width: 5,
+                  points: _info!.polylinePoints
+                      .map((e) => LatLng(e.latitude, e.longitude))
+                      .toList(),
+                )
+            },
             onLongPress: _addMarker,
           ),
           if (_info != null)
-          Positioned(
-            top: 20.0,
-            child: Container(
-              padding: const EdgeInsets.symmetric(
-                vertical: 6.0,
-                horizontal: 12.0,
-              ),
-              decoration: BoxDecoration(
-                color: Colors.yellowAccent,
-                borderRadius: BorderRadius.circular(20.0),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Colors.black26,
-                    offset: Offset(0, 2),
-                    blurRadius: 6.0,
-                  )
-                ],
-              ),
-              child: Text(
-                '${_info!.totalDistance}, ${_info!.totalDuration}',
-                style: const TextStyle(
-                  fontSize: 18.8,
-                  fontWeight: FontWeight.w600,
+            Positioned(
+              top: 20.0,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 6.0,
+                  horizontal: 12.0,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.yellowAccent,
+                  borderRadius: BorderRadius.circular(20.0),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.black26,
+                      offset: Offset(0, 2),
+                      blurRadius: 6.0,
+                    )
+                  ],
+                ),
+                child: Text(
+                  '${_info!.totalDistance}, ${_info!.totalDuration}',
+                  style: const TextStyle(
+                    fontSize: 18.8,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ),
-          ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
