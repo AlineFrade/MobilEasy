@@ -45,32 +45,58 @@ class Profile extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 10),
-              Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+              Container(
+                color: Colors.white,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
                       children: [
-                        _buildAccessibilityContainer('Acessibilidade 1'),
-                        _buildAccessibilityContainer('Acessibilidade 2'),
-                        _buildAccessibilityContainer('Acessibilidade 3'),
-                        _buildAccessibilityContainer('Acessibilidade 4'),
+                        Semantics(
+                          label: 'Acessibilidade auditiva',
+                          child: Checkbox(
+                            value: false,
+                            onChanged: (newValue) {
+                              // mudança da checkbox
+                            },
+                          ),
+                        ),
+                        SizedBox(width: 8),
+                        Text('Acessibilidade auditiva'),
                       ],
                     ),
-                  ),
-                  SizedBox(width: 20),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    Row(
                       children: [
-                        _buildAccessibilityContainer('Acessibilidade 5'),
-                        _buildAccessibilityContainer('Acessibilidade 6'),
-                        _buildAccessibilityContainer('Acessibilidade 7'),
-                        _buildAccessibilityContainer('Acessibilidade 8'),
+                        Semantics(
+                          label: 'Acessibilidade motora',
+                          child: Checkbox(
+                            value: false,
+                            onChanged: (newValue) {
+                              // mudança da checkbox
+                            },
+                          ),
+                        ),
+                        SizedBox(width: 8),
+                        Text('Acessibilidade motora'),
                       ],
                     ),
-                  ),
-                ],
+                    Row(
+                      children: [
+                        Semantics(
+                          //label: 'Acessibilidade visual',
+                          child: Checkbox(
+                            value: false,
+                            onChanged: (newValue) {
+                              // mudança da checkbox
+                            },
+                          ),
+                        ),
+                        SizedBox(width: 8),
+                        Text('Acessibilidade visual'),
+                      ],
+                    ),
+                  ],
+                ),
               ),
               SizedBox(height: 20),
               Column(

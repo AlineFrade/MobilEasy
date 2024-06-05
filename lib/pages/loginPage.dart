@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:MobilEasy/pages/map.dart';
+import 'package:MobilEasy/pages/createAccount.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -50,18 +52,25 @@ class LoginPage extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                ElevatedButton(
-                  onPressed: () {
-                    // Lógica de autenticação
+                Semantics(
+                  label: 'Botão para fazer login',
+                  child: ElevatedButton(
+                      onPressed: () {
+                      Navigator.pushNamed(context, 'userListPage');
                   },
                   child: Text('Login'),
+                  ),
                 ),
-                OutlinedButton(
-                  onPressed: () {
-                    // Navegar para a página de criar conta
+                Semantics(
+                  label: 'Botão para criar conta',
+                  child: ElevatedButton(
+                    onPressed: () {
+                    Navigator.pushNamed(context, 'createAccount');
                   },
                   child: Text('Criar Conta'),
                 ),
+                )
+                
               ],
             ),
           ],

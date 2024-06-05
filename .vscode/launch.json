@@ -1,0 +1,25 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "MobilEasy",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/main.dart" // Adicione esta linha com o caminho para o arquivo principal do seu aplicativo
+        },
+        {
+            "name": "MobilEasy (profile mode)",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/main.dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "MobilEasy (release mode)",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/main.dart",
+            "flutterMode": "release"
+        }
+    ]
+}
