@@ -6,7 +6,7 @@ import 'package:MobilEasy/pages/directions_model.dart';
 
 class DirectionsRepository {
   static const String _baseUrl = 
-      'https://maps.googleapis.com/maps/api/directions/json?';
+      'https://maps.googleapis.com/maps/api/directions/json?&mode=walking';
 
   final Dio _dio;
 
