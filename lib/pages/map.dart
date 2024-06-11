@@ -2,6 +2,7 @@ import 'package:MobilEasy/pages/directions_model.dart';
 import 'package:MobilEasy/pages/directions_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:geocoding/geocoding.dart';
 
 const LatLng currentLocation = LatLng(-19.92548473052761, -43.99315289911171);
 
@@ -17,10 +18,14 @@ class _NavigationPageState extends State<NavigationPage> {
   Marker? _origin;
   Marker? _destination;
   Directions? _info;
+  final TextEditingController _originController = TextEditingController();
+  final TextEditingController _destinationController = TextEditingController();
 
   @override
   void dispose() {
     _googleMapController.dispose();
+    _originController.dispose();
+    _destinationController.dispose();
     super.dispose();
   }
 
@@ -28,6 +33,46 @@ class _NavigationPageState extends State<NavigationPage> {
     target: currentLocation,
     zoom: 14,
   );
+
+  Future<void> _getDirections() async {
+    try {
+      List<Location> originLocations = await locationFromAddress(_originController.text);
+      List<Location> destinationLocations = await locationFromAddress(_destinationController.text);
+
+      if (originLocations.isNotEmpty && destinationLocations.isNotEmpty) {
+        final origin = LatLng(originLocations[0].latitude, originLocations[0].longitude);
+        final destination = LatLng(destinationLocations[0].latitude, destinationLocations[0].longitude);
+
+        setState(() {
+          _origin = Marker(
+            markerId: const MarkerId('origin'),
+            infoWindow: const InfoWindow(title: 'Origin'),
+            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+            position: origin,
+          );
+          _destination = Marker(
+            markerId: const MarkerId('destination'),
+            infoWindow: const InfoWindow(title: 'Destination'),
+            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+            position: destination,
+          );
+        });
+
+        final directions = await DirectionsRepository()
+            .getDirections(origin: origin, destination: destination);
+
+        setState(() {
+          _info = directions;
+        });
+
+        _googleMapController.animateCamera(
+          CameraUpdate.newLatLngBounds(_info!.bounds, 100.0),
+        );
+      }
+    } catch (e) {
+      print('Erro ao obter direções: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +94,7 @@ class _NavigationPageState extends State<NavigationPage> {
                       ),
                     ),
             child: const Text(
-              'Center Origin',
+              'Centralizar Origem',
               style: TextStyle(color: Colors.white),
             ),
           ),
@@ -66,7 +111,7 @@ class _NavigationPageState extends State<NavigationPage> {
                       ),
                     ),
             child: const Text(
-              'Center Destination',
+              'Centralizar Destino',
               style: TextStyle(color: Colors.white),
             ),
           ),
@@ -98,7 +143,7 @@ class _NavigationPageState extends State<NavigationPage> {
           ),
           if (_info != null)
             Positioned(
-              top: 20.0,
+              top: 180.0,
               child: Container(
                 padding: const EdgeInsets.symmetric(
                   vertical: 6.0,
@@ -124,6 +169,57 @@ class _NavigationPageState extends State<NavigationPage> {
                 ),
               ),
             ),
+          Positioned(
+            top: 10.0,
+            left: 20.0,
+            right: 20.0,
+            child: Column(
+              children: [
+                Container(
+                  height: 50.0,
+                  width: double.infinity,
+                  child: TextField(
+                    controller: _originController,
+                    decoration: InputDecoration(
+                      hintText: 'Endereço de origem',
+                      fillColor: Colors.white,
+                      filled: true,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10.0),
+                Container(
+                  height: 50.0,
+                  width: double.infinity,
+                  child: TextField(
+                    controller: _destinationController,
+                    decoration: InputDecoration(
+                      hintText: 'Endereço de destino',
+                      fillColor: Colors.white,
+                      filled: true,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10.0),
+                Container(
+                  height: 40.0,
+                  width: 70.0,
+                  child: FloatingActionButton(
+                    onPressed: _getDirections,
+                    child: Text('Iniciar'),
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
