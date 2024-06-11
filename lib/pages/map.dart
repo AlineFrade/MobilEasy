@@ -34,45 +34,46 @@ class _NavigationPageState extends State<NavigationPage> {
     zoom: 14,
   );
 
-  Future<void> _getDirections() async {
-    try {
-      List<Location> originLocations = await locationFromAddress(_originController.text);
-      List<Location> destinationLocations = await locationFromAddress(_destinationController.text);
+ Future<void> _getDirections() async {
+  try {
+    List<Location> originLocations = await locationFromAddress(_originController.text);
+    List<Location> destinationLocations = await locationFromAddress(_destinationController.text);
 
-      if (originLocations.isNotEmpty && destinationLocations.isNotEmpty) {
-        final origin = LatLng(originLocations[0].latitude, originLocations[0].longitude);
-        final destination = LatLng(destinationLocations[0].latitude, destinationLocations[0].longitude);
+    if (originLocations.isNotEmpty && destinationLocations.isNotEmpty) {
+      final origin = LatLng(originLocations[0].latitude, originLocations[0].longitude);
+      final destination = LatLng(destinationLocations[0].latitude, destinationLocations[0].longitude);
 
-        setState(() {
-          _origin = Marker(
-            markerId: const MarkerId('origin'),
-            infoWindow: const InfoWindow(title: 'Origin'),
-            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
-            position: origin,
-          );
-          _destination = Marker(
-            markerId: const MarkerId('destination'),
-            infoWindow: const InfoWindow(title: 'Destination'),
-            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
-            position: destination,
-          );
-        });
-
-        final directions = await DirectionsRepository()
-            .getDirections(origin: origin, destination: destination);
-
-        setState(() {
-          _info = directions;
-        });
-
-        _googleMapController.animateCamera(
-          CameraUpdate.newLatLngBounds(_info!.bounds, 100.0),
+      setState(() {
+        _origin = Marker(
+          markerId: const MarkerId('origin'),
+          infoWindow: const InfoWindow(title: 'Origin'),
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+          position: origin,
         );
-      }
-    } catch (e) {
-      print('Erro ao obter direções: $e');
+        _destination = Marker(
+          markerId: const MarkerId('destination'),
+          infoWindow: const InfoWindow(title: 'Destination'),
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+          position: destination,
+        );
+      });
+
+      final directions = await DirectionsRepository()
+          .getDirections(origin: origin, destination: destination);
+
+      setState(() {
+        _info = directions;
+      });
+
+      _googleMapController.animateCamera(
+        CameraUpdate.newLatLngBounds(_info!.bounds, 100.0),
+      );
     }
+  } catch (e) {
+    print('Erro ao obter direções: $e');
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -139,7 +140,7 @@ class _NavigationPageState extends State<NavigationPage> {
                       .toList(),
                 )
             },
-            onLongPress: _addMarker,
+            // onLongPress: _addMarker,
           ),
           if (_info != null)
             Positioned(
@@ -235,31 +236,42 @@ class _NavigationPageState extends State<NavigationPage> {
     );
   }
 
-  void _addMarker(LatLng pos) async {
-    if (_origin == null || (_origin != null && _destination != null)) {
-      setState(() {
-        _origin = Marker(
-          markerId: const MarkerId('origin'),
-          infoWindow: const InfoWindow(title: 'Origin'),
-          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
-          position: pos,
-        );
-        _destination = null;
-        _info = null;
-      });
-    } else {
-      setState(() {
-        _destination = Marker(
-          markerId: const MarkerId('destination'),
-          infoWindow: const InfoWindow(title: 'Destination'),
-          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
-          position: pos,
-        );
-      });
+  void _addMarker(String address) async {
+  try {
+    List<Location> locations = await locationFromAddress(address);
+    if (locations.isNotEmpty) {
+      final LatLng pos = LatLng(locations.first.latitude, locations.first.longitude);
+      if (_origin == null || (_origin != null && _destination != null)) {
+        setState(() {
+          _origin = Marker(
+            markerId: const MarkerId('origin'),
+            infoWindow: const InfoWindow(title: 'Origin'),
+            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+            position: pos,
+          );
+          _destination = null;
+          _info = null;
+        });
+      } else {
+        setState(() {
+          _destination = Marker(
+            markerId: const MarkerId('destination'),
+            infoWindow: const InfoWindow(title: 'Destination'),
+            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+            position: pos,
+          );
+        });
 
-      final directions = await DirectionsRepository()
-          .getDirections(origin: _origin!.position, destination: pos);
-      setState(() => _info = directions);
+        final directions = await DirectionsRepository()
+            .getDirections(origin: _origin!.position, destination: pos);
+        setState(() => _info = directions);
+      }
+    } else {
+      print('No location found for the provided address: $address');
     }
+  } catch (e) {
+    print('Error fetching location: $e');
   }
+}
+
 }
