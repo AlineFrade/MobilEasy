@@ -42,6 +42,7 @@ dependencies:
   flutter_polyline_points: ^2.0.0
   google_maps_flutter: ^2.6.1
   geocoding: ^3.0.0
+  speech_to_text: ^6.6.0
 
 dev_dependencies:
   flutter_test:

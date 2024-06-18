@@ -1,8 +1,10 @@
 import 'package:MobilEasy/pages/directions_model.dart';
 import 'package:MobilEasy/pages/directions_repository.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 const LatLng currentLocation = LatLng(-19.92548473052761, -43.99315289911171);
 
@@ -20,6 +22,16 @@ class _NavigationPageState extends State<NavigationPage> {
   Directions? _info;
   final TextEditingController _originController = TextEditingController();
   final TextEditingController _destinationController = TextEditingController();
+  late stt.SpeechToText _speech;
+  String _recognizedText = "";
+  bool _isListening = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _speech = stt.SpeechToText();
+    _initSpeechState();
+  }
 
   @override
   void dispose() {
@@ -34,46 +46,70 @@ class _NavigationPageState extends State<NavigationPage> {
     zoom: 14,
   );
 
- Future<void> _getDirections() async {
-  try {
-    List<Location> originLocations = await locationFromAddress(_originController.text);
-    List<Location> destinationLocations = await locationFromAddress(_destinationController.text);
+  Future<void> _getDirections() async {
+    try {
+      List<Location> originLocations = await locationFromAddress(_originController.text);
+      List<Location> destinationLocations = await locationFromAddress(_destinationController.text);
 
-    if (originLocations.isNotEmpty && destinationLocations.isNotEmpty) {
-      final origin = LatLng(originLocations[0].latitude, originLocations[0].longitude);
-      final destination = LatLng(destinationLocations[0].latitude, destinationLocations[0].longitude);
+      if (originLocations.isNotEmpty && destinationLocations.isNotEmpty) {
+        final origin = LatLng(originLocations[0].latitude, originLocations[0].longitude);
+        final destination = LatLng(destinationLocations[0].latitude, destinationLocations[0].longitude);
 
-      setState(() {
-        _origin = Marker(
-          markerId: const MarkerId('origin'),
-          infoWindow: const InfoWindow(title: 'Origin'),
-          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
-          position: origin,
+        setState(() {
+          _origin = Marker(
+            markerId: const MarkerId('origin'),
+            infoWindow: const InfoWindow(title: 'Origin'),
+            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+            position: origin,
+          );
+          _destination = Marker(
+            markerId: const MarkerId('destination'),
+            infoWindow: const InfoWindow(title: 'Destination'),
+            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+            position: destination,
+          );
+        });
+
+        final directions = await DirectionsRepository().getDirections(origin: origin, destination: destination);
+
+        setState(() {
+          _info = directions;
+        });
+
+        _googleMapController.animateCamera(
+          CameraUpdate.newLatLngBounds(_info!.bounds, 100.0),
         );
-        _destination = Marker(
-          markerId: const MarkerId('destination'),
-          infoWindow: const InfoWindow(title: 'Destination'),
-          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
-          position: destination,
-        );
-      });
-
-      final directions = await DirectionsRepository()
-          .getDirections(origin: origin, destination: destination);
-
-      setState(() {
-        _info = directions;
-      });
-
-      _googleMapController.animateCamera(
-        CameraUpdate.newLatLngBounds(_info!.bounds, 100.0),
-      );
+      }
+    } catch (e) {
+      print('Erro ao obter direções: $e');
     }
-  } catch (e) {
-    print('Erro ao obter direções: $e');
   }
-}
 
+  void _initSpeechState() async {
+    bool available = await _speech.initialize();
+    if (!mounted) return;
+
+    setState(() {
+      _isListening = available;
+    });
+  }
+
+  void _startListening() {
+    _speech.listen(onResult: (result) {
+      setState(() {
+        _recognizedText = result.recognizedWords;
+      });
+    });
+    setState(() {
+      _isListening = true;
+    });
+  }
+  
+  void _clearText() {
+    setState(() {
+      _recognizedText = "";
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -116,6 +152,15 @@ class _NavigationPageState extends State<NavigationPage> {
               style: TextStyle(color: Colors.white),
             ),
           ),
+          IconButton(
+            onPressed: () {
+              _clearText();
+              _startListening();
+            },
+            icon: Icon(_isListening ? Icons.mic : Icons.mic_none),
+            iconSize: 30,
+            color: _isListening ? Colors.green : Colors.grey,
+          ),
         ],
       ),
       body: Stack(
@@ -138,9 +183,8 @@ class _NavigationPageState extends State<NavigationPage> {
                   points: _info!.polylinePoints
                       .map((e) => LatLng(e.latitude, e.longitude))
                       .toList(),
-                )
+                ),
             },
-            // onLongPress: _addMarker,
           ),
           if (_info != null)
             Positioned(
@@ -158,7 +202,7 @@ class _NavigationPageState extends State<NavigationPage> {
                       color: Colors.black26,
                       offset: Offset(0, 2),
                       blurRadius: 6.0,
-                    )
+                    ),
                   ],
                 ),
                 child: Text(
@@ -218,6 +262,10 @@ class _NavigationPageState extends State<NavigationPage> {
                     foregroundColor: Colors.white,
                   ),
                 ),
+                const SizedBox(height: 10.0),
+                Text(
+                  _recognizedText,
+                ),
               ],
             ),
           ),
@@ -235,43 +283,4 @@ class _NavigationPageState extends State<NavigationPage> {
       ),
     );
   }
-
-  void _addMarker(String address) async {
-  try {
-    List<Location> locations = await locationFromAddress(address);
-    if (locations.isNotEmpty) {
-      final LatLng pos = LatLng(locations.first.latitude, locations.first.longitude);
-      if (_origin == null || (_origin != null && _destination != null)) {
-        setState(() {
-          _origin = Marker(
-            markerId: const MarkerId('origin'),
-            infoWindow: const InfoWindow(title: 'Origin'),
-            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
-            position: pos,
-          );
-          _destination = null;
-          _info = null;
-        });
-      } else {
-        setState(() {
-          _destination = Marker(
-            markerId: const MarkerId('destination'),
-            infoWindow: const InfoWindow(title: 'Destination'),
-            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
-            position: pos,
-          );
-        });
-
-        final directions = await DirectionsRepository()
-            .getDirections(origin: _origin!.position, destination: pos);
-        setState(() => _info = directions);
-      }
-    } else {
-      print('No location found for the provided address: $address');
-    }
-  } catch (e) {
-    print('Error fetching location: $e');
-  }
-}
-
 }
