@@ -48,29 +48,36 @@ class _NavigationPageState extends State<NavigationPage> {
 
   Future<void> _getDirections() async {
     try {
-      List<Location> originLocations = await locationFromAddress(_originController.text);
-      List<Location> destinationLocations = await locationFromAddress(_destinationController.text);
+      List<Location> originLocations =
+          await locationFromAddress(_originController.text);
+      List<Location> destinationLocations =
+          await locationFromAddress(_destinationController.text);
 
       if (originLocations.isNotEmpty && destinationLocations.isNotEmpty) {
-        final origin = LatLng(originLocations[0].latitude, originLocations[0].longitude);
-        final destination = LatLng(destinationLocations[0].latitude, destinationLocations[0].longitude);
+        final origin =
+            LatLng(originLocations[0].latitude, originLocations[0].longitude);
+        final destination = LatLng(destinationLocations[0].latitude,
+            destinationLocations[0].longitude);
 
         setState(() {
           _origin = Marker(
             markerId: const MarkerId('origin'),
             infoWindow: const InfoWindow(title: 'Origin'),
-            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+            icon: BitmapDescriptor.defaultMarkerWithHue(
+                BitmapDescriptor.hueGreen),
             position: origin,
           );
           _destination = Marker(
             markerId: const MarkerId('destination'),
             infoWindow: const InfoWindow(title: 'Destination'),
-            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+            icon:
+                BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
             position: destination,
           );
         });
 
-        final directions = await DirectionsRepository().getDirections(origin: origin, destination: destination);
+        final directions = await DirectionsRepository()
+            .getDirections(origin: origin, destination: destination);
 
         setState(() {
           _info = directions;
@@ -94,20 +101,37 @@ class _NavigationPageState extends State<NavigationPage> {
     });
   }
 
-  void _startListening() {
+  void _startOriginListening() {
     _speech.listen(onResult: (result) {
       setState(() {
-        _recognizedText = result.recognizedWords;
+        _originController.text = result.recognizedWords;
       });
     });
     setState(() {
       _isListening = true;
     });
   }
-  
-  void _clearText() {
+
+  void _startDestinyListening() {
+    _speech.listen(onResult: (result) {
+      setState(() {
+        _destinationController.text = result.recognizedWords;
+      });
+    });
     setState(() {
-      _recognizedText = "";
+      _isListening = true;
+    });
+  }
+
+  void _clearOriginText() {
+    setState(() {
+      _originController.text = "";
+    });
+  }
+
+  void _clearDestinyText() {
+    setState(() {
+      _destinationController.text = "";
     });
   }
 
@@ -151,15 +175,6 @@ class _NavigationPageState extends State<NavigationPage> {
               'Centralizar Destino',
               style: TextStyle(color: Colors.white),
             ),
-          ),
-          IconButton(
-            onPressed: () {
-              _clearText();
-              _startListening();
-            },
-            icon: Icon(_isListening ? Icons.mic : Icons.mic_none),
-            iconSize: 30,
-            color: _isListening ? Colors.green : Colors.grey,
           ),
         ],
       ),
@@ -220,36 +235,64 @@ class _NavigationPageState extends State<NavigationPage> {
             right: 20.0,
             child: Column(
               children: [
-                Container(
-                  height: 50.0,
-                  width: double.infinity,
-                  child: TextField(
-                    controller: _originController,
-                    decoration: InputDecoration(
-                      hintText: 'Endereço de origem',
-                      fillColor: Colors.white,
-                      filled: true,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        height: 50.0,
+                        child: TextField(
+                          controller: _originController,
+                          decoration: InputDecoration(
+                            hintText: 'Endereço de origem',
+                            fillColor: Colors.white,
+                            filled: true,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                          ),
+                        ),
                       ),
                     ),
-                  ),
+                    IconButton(
+                      onPressed: () {
+                        _clearOriginText();
+                        _startOriginListening();
+                      },
+                      icon: Icon(_isListening ? Icons.mic : Icons.mic_none),
+                      iconSize: 30,
+                      color: _isListening ? Colors.green : Colors.grey,
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 10.0),
-                Container(
-                  height: 50.0,
-                  width: double.infinity,
-                  child: TextField(
-                    controller: _destinationController,
-                    decoration: InputDecoration(
-                      hintText: 'Endereço de destino',
-                      fillColor: Colors.white,
-                      filled: true,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        height: 50.0,
+                        child: TextField(
+                          controller: _destinationController,
+                          decoration: InputDecoration(
+                            hintText: 'Endereço de destino',
+                            fillColor: Colors.white,
+                            filled: true,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                          ),
+                        ),
                       ),
                     ),
-                  ),
+                    IconButton(
+                      onPressed: () {
+                        _clearDestinyText();
+                        _startDestinyListening();
+                      },
+                      icon: Icon(_isListening ? Icons.mic : Icons.mic_none),
+                      iconSize: 30,
+                      color: _isListening ? Colors.green : Colors.grey,
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 10.0),
                 Container(
