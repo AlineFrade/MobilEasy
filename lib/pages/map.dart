@@ -1,8 +1,10 @@
 import 'package:MobilEasy/pages/directions_model.dart';
 import 'package:MobilEasy/pages/directions_repository.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 const LatLng currentLocation = LatLng(-19.92548473052761, -43.99315289911171);
 
@@ -20,6 +22,16 @@ class _NavigationPageState extends State<NavigationPage> {
   Directions? _info;
   final TextEditingController _originController = TextEditingController();
   final TextEditingController _destinationController = TextEditingController();
+  late stt.SpeechToText _speech;
+  String _recognizedText = "";
+  bool _isListening = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _speech = stt.SpeechToText();
+    _initSpeechState();
+  }
 
   @override
   void dispose() {
@@ -36,24 +48,30 @@ class _NavigationPageState extends State<NavigationPage> {
 
   Future<void> _getDirections() async {
     try {
-      List<Location> originLocations = await locationFromAddress(_originController.text);
-      List<Location> destinationLocations = await locationFromAddress(_destinationController.text);
+      List<Location> originLocations =
+          await locationFromAddress(_originController.text);
+      List<Location> destinationLocations =
+          await locationFromAddress(_destinationController.text);
 
       if (originLocations.isNotEmpty && destinationLocations.isNotEmpty) {
-        final origin = LatLng(originLocations[0].latitude, originLocations[0].longitude);
-        final destination = LatLng(destinationLocations[0].latitude, destinationLocations[0].longitude);
+        final origin =
+            LatLng(originLocations[0].latitude, originLocations[0].longitude);
+        final destination = LatLng(destinationLocations[0].latitude,
+            destinationLocations[0].longitude);
 
         setState(() {
           _origin = Marker(
             markerId: const MarkerId('origin'),
             infoWindow: const InfoWindow(title: 'Origin'),
-            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+            icon: BitmapDescriptor.defaultMarkerWithHue(
+                BitmapDescriptor.hueGreen),
             position: origin,
           );
           _destination = Marker(
             markerId: const MarkerId('destination'),
             infoWindow: const InfoWindow(title: 'Destination'),
-            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+            icon:
+                BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
             position: destination,
           );
         });
@@ -72,6 +90,49 @@ class _NavigationPageState extends State<NavigationPage> {
     } catch (e) {
       print('Erro ao obter direções: $e');
     }
+  }
+
+  void _initSpeechState() async {
+    bool available = await _speech.initialize();
+    if (!mounted) return;
+
+    setState(() {
+      _isListening = available;
+    });
+  }
+
+  void _startOriginListening() {
+    _speech.listen(onResult: (result) {
+      setState(() {
+        _originController.text = result.recognizedWords;
+      });
+    });
+    setState(() {
+      _isListening = true;
+    });
+  }
+
+  void _startDestinyListening() {
+    _speech.listen(onResult: (result) {
+      setState(() {
+        _destinationController.text = result.recognizedWords;
+      });
+    });
+    setState(() {
+      _isListening = true;
+    });
+  }
+
+  void _clearOriginText() {
+    setState(() {
+      _originController.text = "";
+    });
+  }
+
+  void _clearDestinyText() {
+    setState(() {
+      _destinationController.text = "";
+    });
   }
 
   @override
@@ -137,9 +198,8 @@ class _NavigationPageState extends State<NavigationPage> {
                   points: _info!.polylinePoints
                       .map((e) => LatLng(e.latitude, e.longitude))
                       .toList(),
-                )
+                ),
             },
-            onLongPress: _addMarker,
           ),
           if (_info != null)
             Positioned(
@@ -157,7 +217,7 @@ class _NavigationPageState extends State<NavigationPage> {
                       color: Colors.black26,
                       offset: Offset(0, 2),
                       blurRadius: 6.0,
-                    )
+                    ),
                   ],
                 ),
                 child: Text(
@@ -175,36 +235,64 @@ class _NavigationPageState extends State<NavigationPage> {
             right: 20.0,
             child: Column(
               children: [
-                Container(
-                  height: 50.0,
-                  width: double.infinity,
-                  child: TextField(
-                    controller: _originController,
-                    decoration: InputDecoration(
-                      hintText: 'Endereço de origem',
-                      fillColor: Colors.white,
-                      filled: true,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        height: 50.0,
+                        child: TextField(
+                          controller: _originController,
+                          decoration: InputDecoration(
+                            hintText: 'Endereço de origem',
+                            fillColor: Colors.white,
+                            filled: true,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                          ),
+                        ),
                       ),
                     ),
-                  ),
+                    IconButton(
+                      onPressed: () {
+                        _clearOriginText();
+                        _startOriginListening();
+                      },
+                      icon: Icon(_isListening ? Icons.mic : Icons.mic_none),
+                      iconSize: 30,
+                      color: _isListening ? Colors.green : Colors.grey,
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 10.0),
-                Container(
-                  height: 50.0,
-                  width: double.infinity,
-                  child: TextField(
-                    controller: _destinationController,
-                    decoration: InputDecoration(
-                      hintText: 'Endereço de destino',
-                      fillColor: Colors.white,
-                      filled: true,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        height: 50.0,
+                        child: TextField(
+                          controller: _destinationController,
+                          decoration: InputDecoration(
+                            hintText: 'Endereço de destino',
+                            fillColor: Colors.white,
+                            filled: true,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                          ),
+                        ),
                       ),
                     ),
-                  ),
+                    IconButton(
+                      onPressed: () {
+                        _clearDestinyText();
+                        _startDestinyListening();
+                      },
+                      icon: Icon(_isListening ? Icons.mic : Icons.mic_none),
+                      iconSize: 30,
+                      color: _isListening ? Colors.green : Colors.grey,
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 10.0),
                 Container(
@@ -216,6 +304,10 @@ class _NavigationPageState extends State<NavigationPage> {
                     backgroundColor: Colors.blue,
                     foregroundColor: Colors.white,
                   ),
+                ),
+                const SizedBox(height: 10.0),
+                Text(
+                  _recognizedText,
                 ),
               ],
             ),
@@ -233,33 +325,5 @@ class _NavigationPageState extends State<NavigationPage> {
         child: const Icon(Icons.center_focus_strong),
       ),
     );
-  }
-
-  void _addMarker(LatLng pos) async {
-    if (_origin == null || (_origin != null && _destination != null)) {
-      setState(() {
-        _origin = Marker(
-          markerId: const MarkerId('origin'),
-          infoWindow: const InfoWindow(title: 'Origin'),
-          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
-          position: pos,
-        );
-        _destination = null;
-        _info = null;
-      });
-    } else {
-      setState(() {
-        _destination = Marker(
-          markerId: const MarkerId('destination'),
-          infoWindow: const InfoWindow(title: 'Destination'),
-          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
-          position: pos,
-        );
-      });
-
-      final directions = await DirectionsRepository()
-          .getDirections(origin: _origin!.position, destination: pos);
-      setState(() => _info = directions);
-    }
   }
 }
