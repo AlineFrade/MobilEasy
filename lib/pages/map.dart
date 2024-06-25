@@ -183,6 +183,7 @@ class _NavigationPageState extends State<NavigationPage> {
         children: [
           GoogleMap(
             myLocationButtonEnabled: false,
+            zoomControlsEnabled: false,
             initialCameraPosition: _initialCameraPosition,
             onMapCreated: (controller) => _googleMapController = controller,
             markers: {
