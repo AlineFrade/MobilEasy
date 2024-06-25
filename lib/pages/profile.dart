@@ -2,8 +2,17 @@
 
 import 'package:flutter/material.dart';
 
-class Profile extends StatelessWidget {
+class Profile extends StatefulWidget {
   const Profile({Key? key}) : super(key: key);
+
+  @override
+  _ProfileState createState() => _ProfileState();
+}
+
+class _ProfileState extends State<Profile> {
+  bool isAuditoryChecked = false;
+  bool isMotorChecked = false;
+  bool isVisualChecked = false;
 
   @override
   Widget build(BuildContext context) {
@@ -55,9 +64,11 @@ class Profile extends StatelessWidget {
                         Semantics(
                           label: 'Acessibilidade auditiva',
                           child: Checkbox(
-                            value: false,
+                            value: isAuditoryChecked,
                             onChanged: (newValue) {
-                              // mudança da checkbox
+                              setState(() {
+                                isAuditoryChecked = newValue!;
+                              });
                             },
                           ),
                         ),
@@ -70,9 +81,11 @@ class Profile extends StatelessWidget {
                         Semantics(
                           label: 'Acessibilidade motora',
                           child: Checkbox(
-                            value: false,
+                            value: isMotorChecked,
                             onChanged: (newValue) {
-                              // mudança da checkbox
+                              setState(() {
+                                isMotorChecked = newValue!;
+                              });
                             },
                           ),
                         ),
@@ -83,11 +96,13 @@ class Profile extends StatelessWidget {
                     Row(
                       children: [
                         Semantics(
-                          //label: 'Acessibilidade visual',
+                          label: 'Acessibilidade visual',
                           child: Checkbox(
-                            value: false,
+                            value: isVisualChecked,
                             onChanged: (newValue) {
-                              // mudança da checkbox
+                              setState(() {
+                                isVisualChecked = newValue!;
+                              });
                             },
                           ),
                         ),
@@ -140,29 +155,6 @@ class Profile extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildAccessibilityContainer(String text) {
-    return Container(
-      padding: EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: Colors.grey[200],
-      ),
-      child: Row(
-        children: <Widget>[
-          Checkbox(
-            value: false,
-            onChanged: (newValue) {
-              // mudança da checkbox
-            },
-          ),
-          Text(
-            text,
-            style: TextStyle(fontSize: 16),
-          ),
-        ],
       ),
     );
   }

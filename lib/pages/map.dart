@@ -149,7 +149,7 @@ class _NavigationPageState extends State<NavigationPage> {
                       CameraUpdate.newCameraPosition(
                         CameraPosition(
                           target: _origin!.position,
-                          zoom: 14.5,
+                          zoom: 20,
                           tilt: 50.0,
                         ),
                       ),
@@ -166,7 +166,7 @@ class _NavigationPageState extends State<NavigationPage> {
                       CameraUpdate.newCameraPosition(
                         CameraPosition(
                           target: _destination!.position,
-                          zoom: 14.5,
+                          zoom: 20,
                           tilt: 50.0,
                         ),
                       ),

@@ -19,8 +19,8 @@ class MyApp extends StatelessWidget {
       title: 'Onboarding Screen',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primaryColor: Colors.white),
-      //home: MaterialYou(),
-      home: NavigationPage(),
+      home: MaterialYou(),
+      // home: NavigationPage(),
 
       routes: {
         'navigationPage': (context) => NavigationPage(),
