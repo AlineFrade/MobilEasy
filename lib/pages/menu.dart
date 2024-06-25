@@ -22,12 +22,12 @@ class MaterialYou extends StatefulWidget {
 class _MaterialYouState extends State<MaterialYou> {
   int _currentIndex = 0;
   List<Widget> pages = const [
+    NavigationPage(),
     Profile(),
     Configurations(),
-    NavigationPage(),
-    //Text('MAP', style: _textStyle),
-    //CreateProfile(),
-    LoginPage(),
+    // Text('MAP', style: _textStyle),
+    // CreateProfile(),
+    // LoginPage(),
   ];
   @override
   Widget build(BuildContext context) {
@@ -77,6 +77,13 @@ class _MaterialYouState extends State<MaterialYou> {
               },
               destinations: const [
                 NavigationDestination(
+                  icon: Icon(Icons.home_outlined,
+                      color: Color.fromARGB(255, 0, 0, 0)),
+                  selectedIcon: Icon(Icons.home_outlined,
+                      color: Color.fromARGB(255, 104, 60, 10)),
+                  label: 'home',
+                ),
+                NavigationDestination(
                   icon: Icon(Icons.person_outlined,
                       color: Color.fromARGB(255, 0, 0, 0)),
                   selectedIcon: Icon(Icons.person_outlined,
@@ -90,27 +97,6 @@ class _MaterialYouState extends State<MaterialYou> {
                       color: Color.fromARGB(255, 185, 213, 131)),
                   label: 'Change profile',
                 ),
-                NavigationDestination(
-                  icon: Icon(Icons.home_outlined,
-                      color: Color.fromARGB(255, 0, 0, 0)),
-                  selectedIcon: Icon(Icons.home_outlined,
-                      color: Color.fromARGB(255, 104, 60, 10)),
-                  label: 'home',
-                ),
-                NavigationDestination(
-                  icon: Icon(Icons.person_add_alt_1_outlined,
-                      color: Color.fromARGB(255, 0, 0, 0)),
-                  selectedIcon: Icon(Icons.person_add_alt_1_outlined,
-                      color: Color.fromARGB(255, 104, 60, 10)),
-                  label: 'Create  Account',
-                ),
-                NavigationDestination(
-                  icon: Icon(Icons.lock_outline,
-                      color: Color.fromARGB(255, 0, 0, 0)),
-                  selectedIcon: Icon(Icons.lock_outline,
-                      color: Color.fromARGB(255, 104, 60, 10)),
-                  label: 'Login',
-                ),
               ],
             ),
           ),
@@ -118,4 +104,5 @@ class _MaterialYouState extends State<MaterialYou> {
       ),
     );
   }
+  
 }
